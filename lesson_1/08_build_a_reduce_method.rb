@@ -8,12 +8,12 @@ def reduce(collection, starting_val=nil)
     acc = starting_val
   end
 
-  current_num = collection[idx]
+  current_element = collection[idx]
 
   until idx == collection.length
-    acc = yield(acc, current_num)
+    acc = yield(acc, current_element)
     idx += 1
-    current_num = collection[idx]
+    current_element = collection[idx]
   end
 
   acc

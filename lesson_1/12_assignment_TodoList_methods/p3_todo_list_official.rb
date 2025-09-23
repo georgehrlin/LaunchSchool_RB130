@@ -1,4 +1,4 @@
-# Based on todo_list_official.rb from 10. Assignment: TodoList#each
+# Based on p3_todo_list_official.rb from 11. Assignment: TodoList#select
 
 # This class represents a todo item and its associated
 # data: name and description. There's also a "done"
@@ -99,6 +99,7 @@ class TodoList
       mark_done_at(idx)
     end
   end
+  alias_method :mark_all_done, :done!
 
   def remove_at(idx)
     @todos.delete(item_at(idx))
@@ -116,28 +117,52 @@ class TodoList
 
   def each
     @todos.each { |todo| yield(todo) }
+    self
   end
 
   def select
-    result = TodoList.new(self.title)
+    list = TodoList.new(title)
     each do |todo|
-      result.add(todo) if yield(todo)
+      list.add(todo) if yield(todo)
     end
-    result
+    list
+  end
+
+  def find_by_title(todo_title)
+    each { |todo| return todo if todo.title == todo_title }
+    nil
+    # Official solution: select { |todo| todo.title == todo_title }.first
+  end
+
+  def all_done
+    select { |todo| todo.done? }
+  end
+
+  def all_not_done
+    select { |todo| !todo.done? }
+  end
+
+  def mark_done(todo_title)
+    each do |todo|
+      if todo.title == todo_title
+        todo.done!
+        break
+      end
+    end
+    # Official solution:
+    # find_by_title(todo_title) && find_by_title(todo_title).done!
+  end
+
+  def mark_all_undone
+    each { |todo| todo.undone! }
   end
 end
 
-todo1 = Todo.new("Buy milk")
-todo2 = Todo.new("Clean room")
-todo3 = Todo.new("Go to gym")
+todo1 = Todo.new('Buy milk')
+todo2 = Todo.new('Clean room')
+todo3 = Todo.new('Go to gym')
 
 list = TodoList.new("Today's Todos")
 list.add(todo1)
 list.add(todo2)
 list.add(todo3)
-
-todo1.done!
-
-results = list.select { |todo| todo.done? }    # you need to implement this method
-
-puts results.inspect

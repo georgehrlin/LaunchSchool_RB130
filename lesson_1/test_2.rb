@@ -1,33 +1,21 @@
-# Problem 3:
+def reduce(collection, default=collection[0])
+  total = default
+  # Original: total = default unless default.nil?
 
-module Timer
-  HRS_PER_DAY = "we're in Timer"
-end
-
-module Times
-  #HRS_PER_DAY = "we're in Times"
-
-  def namespace_ref
-    p self.class
-    p self.class::HRS_PER_DAY
-  end
-
-  def ref
-    p HRS_PER_DAY
-  end
-end
-
-module Timepieces
-  HRS_PER_DAY = "we're in Timepieces"
-
-  class Clock
-    include Timer
-    include Times
-
-    def say_hours
-      p HRS_PER_DAY
+  if total != collection.first
+    collection.each do |item|
+      total = yield(total, item)
+    end
+  else
+    collection[1..].each do |item|
+      total = yield(total, item)
     end
   end
+
+  total
 end
 
-Timepieces::Clock.new.namespace_ref # NameError
+p reduce(['a', 'b', 'c']) { |acc, value| acc += value }     # =>  "abc"
+p reduce([1, 2], ['a', 'b']) { |acc, value| acc + value } # =>  [1, 2, "a", "b"]
+p reduce([1, 2, 3, 4, 5]) { |acc, num| acc + num }        # => 15
+p reduce([1, 2, 3, 4, 5], 10) { |acc, num| acc + num }   # => 25

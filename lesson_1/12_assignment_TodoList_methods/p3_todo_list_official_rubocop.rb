@@ -1,16 +1,16 @@
-# Based on todo_list_official.rb from 10. Assignment: TodoList#each
+# Based on p3_todo_list_official.rb from 11. Assignment: TodoList#select
 
 # This class represents a todo item and its associated
 # data: name and description. There's also a "done"
 # flag to show whether this todo item is done.
 
 class Todo
-  DONE_MARKER = 'X'
-  UNDONE_MARKER = ' '
+  DONE_MARKER = 'X'.freeze
+  UNDONE_MARKER = ' '.freeze
 
   attr_accessor :title, :description, :done
 
-  def initialize(title, description='')
+  def initialize(title, description = '')
     @title = title
     @description = description
     @done = false
@@ -32,10 +32,10 @@ class Todo
     "[#{done? ? DONE_MARKER : UNDONE_MARKER}] #{title}"
   end
 
-  def ==(otherTodo)
-    title == otherTodo.title &&
-      description == otherTodo.description &&
-      done == otherTodo.done
+  def ==(other)
+    title == other.title &&
+      description == other.description &&
+      done == other.done
   end
 end
 
@@ -72,7 +72,7 @@ class TodoList
   end
 
   def done?
-    @todos.all? { |todo| todo.done? }
+    @todos.all?(&:done?)
   end
 
   def <<(todo)
@@ -80,7 +80,7 @@ class TodoList
 
     @todos << todo
   end
-  alias_method :add, :<<
+  alias add <<
 
   def item_at(idx)
     @todos.fetch(idx)
@@ -99,6 +99,7 @@ class TodoList
       mark_done_at(idx)
     end
   end
+  alias mark_all_done done!
 
   def remove_at(idx)
     @todos.delete(item_at(idx))
@@ -114,30 +115,60 @@ class TodoList
     @todos.clone
   end
 
-  def each
-    @todos.each { |todo| yield(todo) }
+  def each(&block)
+    @todos.each(&block)
+    self
   end
 
   def select
-    result = TodoList.new(self.title)
+    list = TodoList.new(title)
     each do |todo|
-      result.add(todo) if yield(todo)
+      list.add(todo) if yield(todo)
     end
-    result
+    list
+  end
+
+  def find_by_title(todo_title)
+    each { |todo| return todo if todo.title == todo_title }
+    nil
+    # Official solution: select { |todo| todo.title == todo_title }.first
+  end
+
+  def all_done
+    select(&:done?)
+  end
+
+  def all_not_done
+    select { |todo| !todo.done? }
+  end
+
+  def mark_done(todo_title)
+    each do |todo|
+      if todo.title == todo_title
+        todo.done!
+        break
+      end
+    end
+    # Official solution:
+    # find_by_title(todo_title) && find_by_title(todo_title).done!
+  end
+
+  def mark_all_undone
+    each(&:undone!)
   end
 end
 
-todo1 = Todo.new("Buy milk")
-todo2 = Todo.new("Clean room")
-todo3 = Todo.new("Go to gym")
+todo1 = Todo.new('Buy milk')
+todo2 = Todo.new('Clean room')
+todo3 = Todo.new('Go to gym')
 
 list = TodoList.new("Today's Todos")
-list.add(todo1)
-list.add(todo2)
-list.add(todo3)
+list << todo1
+list << todo2
+list << todo3
 
-todo1.done!
+p list
 
-results = list.select { |todo| todo.done? }    # you need to implement this method
+list.mark_all_done
 
-puts results.inspect
+p list

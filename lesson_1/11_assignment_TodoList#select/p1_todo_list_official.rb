@@ -1,4 +1,4 @@
-# todo_list_official.rb from 10. Assignment: TodoList#each
+# Based on todo_list_official.rb from 10. Assignment: TodoList#each
 
 # This class represents a todo item and its associated
 # data: name and description. There's also a "done"
